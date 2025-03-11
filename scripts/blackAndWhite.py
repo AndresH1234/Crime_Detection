@@ -1,40 +1,55 @@
 import cv2
 import numpy as np
+import os
+import pandas as pd
 
-def es_blanco_y_negro(video_path, sample_rate=10, threshold=10):
-    cap = cv2.VideoCapture(video_path)
-    if not cap.isOpened():
-        print("No se pudo abrir el video.")
-        return False
+class BlackAndWhite:
+    def __init__(self, data_folder: str, df_videos: pd.DataFrame):
+        self.data_folder = data_folder
+        self.df_videos = df_videos
 
-    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    analyzed_frames = 0
-    bw_frames = 0
+    def es_blanco_y_negro(self, video_path, sample_rate=10, threshold=5):
+        cap = cv2.VideoCapture(video_path)
+        if not cap.isOpened():
+            print(f"No se pudo abrir el video: {video_path}")
+            return False
 
-    for i in range(0, frame_count, sample_rate):
-        cap.set(cv2.CAP_PROP_POS_FRAMES, i)
-        ret, frame = cap.read()
-        if not ret:
-            continue
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        analyzed_frames = 0
+        bw_frames = 0
 
-        # Convertir a escala de grises y comparar con el original
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        diff = cv2.absdiff(frame, cv2.merge([gray, gray, gray]))  # Comparar cada canal con la escala de grises
-        diff_mean = np.mean(diff)  # Promedio de diferencias
+        for i in range(0, frame_count, sample_rate):
+            cap.set(cv2.CAP_PROP_POS_FRAMES, i)
+            ret, frame = cap.read()
+            if not ret or frame is None:
+                continue
 
-        if diff_mean < threshold:
-            bw_frames += 1  # Se considera blanco y negro
+            # Convertir a escala de grises
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            
+            # Calcular la diferencia entre los canales de color y la versión en grises
+            diff_b = np.abs(frame[:, :, 0] - gray)
+            diff_g = np.abs(frame[:, :, 1] - gray)
+            diff_r = np.abs(frame[:, :, 2] - gray)
 
-        analyzed_frames += 1
+            # Usar desviación estándar como métrica de variabilidad de color
+            diff_std = np.std([diff_b, diff_g, diff_r])
 
-    cap.release()
-    
-    # Si la mayoría de los fotogramas son blanco y negro, el video se considera blanco y negro
-    return bw_frames / analyzed_frames > 0.9
+            if diff_std < threshold:
+                bw_frames += 1
 
-# Uso del programa
-video_path = "video.mp4"
-if es_blanco_y_negro(video_path):
-    print("El video es en blanco y negro.")
-else:
-    print("El video es a color.")
+            analyzed_frames += 1
+
+        cap.release()
+        return (bw_frames / analyzed_frames) > 0.9 if analyzed_frames > 0 else False
+
+    def encontrar_bw(self):
+        resultados = []
+        
+        for _, row in self.df_videos.iterrows():
+            video_path = os.path.join(self.data_folder, row['Evento'], row['Video'])
+            if os.path.exists(video_path) and self.es_blanco_y_negro(video_path):
+                print(f"[Blanco y Negro] Video: {row['Video']}")
+                resultados.append(row)
+        
+        return pd.DataFrame(resultados)
