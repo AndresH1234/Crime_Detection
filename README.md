@@ -16,7 +16,7 @@ En el siguiente ReadMe se detallan los detalles del proyecto de crime detection.
 │   ├── blackAndWhite.py 
 │   ├── createTable.py
 │   ├── duplicados.py 
-├── requirements.txt   # Dependencias del proyecto
+├── environment.yml   # Dependencias del proyecto
 ```
 
 ## Instalación
@@ -33,3 +33,10 @@ Guía para contribuir al proyecto, incluyendo cómo clonar el repositorio y envi
 
 ## Contacto
 Si se necesita mayor información, escribir al mail andres.herrerag4@gmail.com
+
+## References
+
+- Carreira, J., & Zisserman, A. (2017). Quo Vadis, Action Recognition? A New Model and the Kinetics Dataset. *arXiv preprint arXiv:1705.07750*.  
+  Available at: [https://arxiv.org/abs/1705.07750](https://arxiv.org/abs/1705.07750)
+
+- The I3D models used in this project are based on the implementation and pre-trained checkpoints provided by DeepMind in their [Kinetics-I3D repository](https://github.com/deepmind/kinetics-i3d).
