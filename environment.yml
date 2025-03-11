@@ -1,0 +1,13 @@
+name: proyecto_i3d
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - pip
+  - tensorflow-probability=0.19
+  - pip:
+      - dm-sonnet==1.36
+      - tensorflow-macos
+      - tensorflow-metal
+      - tensorflow_probability==0.8.0

@@ -22,7 +22,7 @@ En el siguiente ReadMe se detallan los detalles del proyecto de crime detection.
 ## Instalación
 Para instalar las dependencias necesarias, ejecute:
 ```bash
-pip install -r requirements.txt
+conda env create -f environment.yml
 ```
 
 ## Uso
