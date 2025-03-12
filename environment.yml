@@ -6,7 +6,4 @@ dependencies:
   - python=3.8
   - pip
   - pip:
-      - dm-sonnet==1.36
-      - tensorflow-macos
-      - tensorflow-metal
-      - tensorflow-probability==0.8.0
+      - -r requirements.txt
