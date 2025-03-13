@@ -30,8 +30,10 @@ Para instalar las dependencias necesarias, ejecute:
 conda env create -f environment.yml
 ```
 
-## Uso
-El siguiente proyecto utiliza el modelo i3d para entrenar un modelo de reconocimiento de crimenes. Se pueden apreciar los resultados del proyecto en 4_models.ipynb
+## Desarrollo
+El siguiente proyecto utiliza el modelo i3d para entrenar un modelo de reconocimiento de crimenes. Se pueden apreciar los resultados del proyecto en 4_models.ipynb.
+
+Se realizaron dos modelos, uno solamente utilizando el modelo i3d; y el otro, combinando el modelo i3d con una ConvLSTM2D.
 
 ## Contribución
 
