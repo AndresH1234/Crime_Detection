@@ -5,14 +5,15 @@ import imagehash
 from PIL import Image
 
 class Duplicados:
-    def __init__(self, data_folder, df_videos):
+    def __init__(self, data_folder, df_videos, time_sec=10):
         self.data_folder = data_folder
         self.df_videos = df_videos
+        self.time_sec = time_sec
 
-    def extract_frame(self, video_path, time_sec=10):
+    def extract_frame(self, video_path):
         """ Extrae un fotograma en el segundo especificado. """
         cap = cv2.VideoCapture(video_path)
-        cap.set(cv2.CAP_PROP_POS_MSEC, time_sec * 1000)
+        cap.set(cv2.CAP_PROP_POS_MSEC, self.time_sec * 1000)
         success, frame = cap.read()
         cap.release()
         return frame if success else None
