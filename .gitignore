@@ -9,6 +9,11 @@ data/Anomaly-Detection-Dataset/*
 # Ignorar archivo /data/Anomaly-Detection-Dataset.zip
 data/Anomaly-Detection-Dataset.zip
 
+# Ignora archivos en la carpeta data/train, data/test, data/val
+data/train/*
+data/test/*
+data/val/*
+
 # Ignorar todos los archivos que comiencen con ._
 ._*
 
