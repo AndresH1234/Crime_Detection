@@ -14,6 +14,9 @@ data/train/*
 data/test/*
 data/valid/*
 
+# Ignorar checkpoints
+notebooks/checkpoints/*
+
 # Ignorar todos los archivos que comiencen con ._
 ._*
 
