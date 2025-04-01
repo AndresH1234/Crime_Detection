@@ -1,9 +1,12 @@
 name: proyecto_i3d
 channels:
+  - nvidia
   - conda-forge
   - defaults
 dependencies:
   - python=3.9
+  - cudatoolkit=11.2
+  - cudnn=8.1
   - pip
   - pip:
       - -r requirements.txt
