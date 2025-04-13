@@ -51,3 +51,6 @@ Si se necesita mayor información, escribir al mail andres.herrerag4@gmail.com
 
 [2] brunomcebola, "Modificación del modelo I3D en el repositorio original,"  
     GitHub, [30/08/2024]. [Online]. Available: https://github.com/google-deepmind/kinetics-i3d/pull/127
+
+[3] Surmenok P, "keras_lr_finder" 
+    GitHub, [2018] . [Online]. Available: https://github.com/surmenok/keras_lr_finder

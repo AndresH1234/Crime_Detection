@@ -4,6 +4,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from models.i3d import InceptionI3d
 import tensorflow as tf
+from tensorflow.keras.metrics import AUC
 
 # Clase adaptadora para usar InceptionI3D como modelo de Keras
 class KerasI3D(tf.keras.Model):
@@ -18,9 +19,8 @@ class KerasI3D(tf.keras.Model):
     def build_model(num_classes=2, initial_learning_rate=1e-4):
         model = KerasI3D(num_classes=num_classes)
         optimizer = tf.keras.optimizers.Adam(
-            learning_rate=initial_learning_rate
+            learning_rate=initial_learning_rate,
         )
-        loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-
-        model.compile(optimizer=optimizer, loss=loss_fn, metrics=["accuracy"])
+        loss_fn = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+        model.compile(optimizer=optimizer, loss=loss_fn, metrics=["accuracy", AUC(name="auc")])
         return model
