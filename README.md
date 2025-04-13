@@ -5,12 +5,14 @@ En el siguiente ReadMe se detallan los detalles del proyecto de crime detection.
 
 ## Estructura del Proyecto
 ```
-├── data               
+├── data            
 │   ├── raw
+│   ├── ml
 │   ├── clean
 ├── docs               
 ├── models             # Carpeta para modelos
 │   ├── i3d.py         # Modelo Inception I3D
+│   ├── KerasI3D.py         # Modelo Inception I3D
 ├── notebooks          
 │   ├── 1_exploratory_data_analysis.ipynb
 │   ├── 2_data_wrangling.ipynb
@@ -22,6 +24,7 @@ En el siguiente ReadMe se detallan los detalles del proyecto de crime detection.
 │   ├── createTable.py
 │   ├── duplicados.py 
 ├── environment.yml 
+├── requirements.txt 
 ```
 
 ## Instalación
