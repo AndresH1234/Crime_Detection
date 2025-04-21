@@ -28,6 +28,7 @@ jedi
 joblib==1.4.2
 jupyter-client
 jupyter_core
+keras-tuner==1.0.3
 keras-nightly==2.5.0.dev2021032900
 Keras-Preprocessing==1.1.2
 kiwisolver==1.4.7
