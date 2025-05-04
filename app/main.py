@@ -92,12 +92,10 @@ def load_model():
 
     return model.load_weights(CHECKPOINT_DIR)
 
-# --- VIDEO TO FRAMES
 def preprocess_video(video_path, num_frames=NUM_FRAMES, frame_size=FRAME_SIZE):
     cap = cv2.VideoCapture(video_path)
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     frames = []
-
     step = max(1, total_frames // num_frames)
     for i in range(num_frames):
         cap.set(cv2.CAP_PROP_POS_FRAMES, i * step)
@@ -108,36 +106,36 @@ def preprocess_video(video_path, num_frames=NUM_FRAMES, frame_size=FRAME_SIZE):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frames.append(frame / 255.0)
     cap.release()
-
     while len(frames) < num_frames:
         frames.append(np.zeros((*frame_size, 3)))
     return np.expand_dims(np.array(frames, dtype=np.float32), axis=0)
 
-# --- PREDICT AND ATTENTION (placeholder)
 def predict_crime(model, video_tensor):
     prediction = model.predict(video_tensor)[0]
-    return prediction, None  # Return attention map later
+    return prediction
 
-# --- STREAMLIT UI
-st.title("🎥 Crime Detection Demo")
-st.write("Sube un video para predecir si contiene una escena criminal.")
+if __name__ == "__main__":
+    import argparse
 
-video_file = st.file_uploader("Sube tu video", type=["mp4", "avi", "mov"])
+    parser = argparse.ArgumentParser(description="Detectar crimen en video")
+    parser.add_argument("--video", type=str, required=True, help="Ruta al video")
 
-if video_file:
-    with tempfile.NamedTemporaryFile(delete=False) as tmp:
-        tmp.write(video_file.read())
-        tmp_path = tmp.name
+    args = parser.parse_args()
 
-    st.video(video_file)
-    st.write("Procesando...")
+    if not os.path.exists(args.video):
+        print("Archivo de video no encontrado.")
+        exit(1)
 
-    video_tensor = preprocess_video(tmp_path)
+    print("📦 Cargando modelo...")
     model = load_model()
-    prediction, _ = predict_crime(model, video_tensor)
 
-    label = "🔴 Crimen" if np.argmax(prediction) == 1 else "🟢 No crimen"
+    print("🎞️ Procesando video...")
+    video_tensor = preprocess_video(args.video)
+
+    print("🔍 Prediciendo...")
+    prediction = predict_crime(model, video_tensor)
+    label = "Crimen" if np.argmax(prediction) == 1 else "No crimen"
     confidence = f"{100 * np.max(prediction):.2f}%"
 
-    st.subheader(f"Predicción: {label}")
-    st.text(f"Confianza: {confidence}")
+    print(f"\n✅ Resultado: {label}")
+    print(f"📊 Confianza: {confidence}")
