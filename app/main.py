@@ -1,5 +1,8 @@
-# crime_demo.py
-import streamlit as st
+
+"""Comando para ejecutar el script:
+PYTHONPATH=/mnt/DGX0Raid/aherrerag/Crime_Detection /home/aherrerag/anaconda3/envs/proyecto_i3d/bin/python /mnt/DGX0Raid/aherrerag/Crime_Detection/app/main.py --video /mnt/DGX0Raid/aherrerag/Crime_Detection/data/test/Robbery034_x264.mp4
+"""
+
 import tensorflow as tf
 from kerastuner.tuners import RandomSearch
 from tensorflow.keras import Model
@@ -13,14 +16,15 @@ import cv2
 import tempfile
 import os
 import matplotlib.pyplot as plt
+import argparse
 from models.i3d import InceptionI3d
+
 # --- CONFIG
 CHECKPOINT_DIR = "/mnt/DGX0Raid/aherrerag/Crime_Detection/notebooks/checkpoints/i3d_convlstm_1/best_model"
 NUM_FRAMES = 32
 FRAME_SIZE = (224, 224)
 
 # --- LOAD MODEL
-@st.cache_resource
 def load_model():
     def build_model(hp):
         class Tuned_I3D_ConvLSTM(Model):
@@ -63,6 +67,7 @@ def load_model():
         model = Tuned_I3D_ConvLSTM(num_classes=num_classes)
         model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy', AUC(name='auc')])
         return model
+    
     tuner = RandomSearch(
         build_model,
         objective='val_accuracy',
@@ -89,8 +94,9 @@ def load_model():
     optimizer = tf.keras.optimizers.Adam(learning_rate=1e-7)
     loss_fn = tf.keras.losses.BinaryCrossentropy(from_logits=False)
     model.compile(optimizer=optimizer, loss=loss_fn, metrics=["accuracy", AUC(name="auc")])
+    model.load_weights(CHECKPOINT_DIR)
 
-    return model.load_weights(CHECKPOINT_DIR)
+    return model
 
 def preprocess_video(video_path, num_frames=NUM_FRAMES, frame_size=FRAME_SIZE):
     cap = cv2.VideoCapture(video_path)
@@ -114,28 +120,35 @@ def predict_crime(model, video_tensor):
     prediction = model.predict(video_tensor)[0]
     return prediction
 
-if __name__ == "__main__":
-    import argparse
-
+def main():
     parser = argparse.ArgumentParser(description="Detectar crimen en video")
     parser.add_argument("--video", type=str, required=True, help="Ruta al video")
-
     args = parser.parse_args()
 
     if not os.path.exists(args.video):
         print("Archivo de video no encontrado.")
         exit(1)
 
-    print("📦 Cargando modelo...")
+    print("Cargando modelo...")
     model = load_model()
 
-    print("🎞️ Procesando video...")
+    print("Procesando video...")
     video_tensor = preprocess_video(args.video)
 
-    print("🔍 Prediciendo...")
-    prediction = predict_crime(model, video_tensor)
-    label = "Crimen" if np.argmax(prediction) == 1 else "No crimen"
-    confidence = f"{100 * np.max(prediction):.2f}%"
+    print("Prediciendo...")
+    prediction = predict_crime(model, video_tensor)  # Asume que retorna un array de probabilidades (ej: [0.1, 0.9])
 
-    print(f"\n✅ Resultado: {label}")
-    print(f"📊 Confianza: {confidence}")
+    # Etiquetas para las clases
+    class_labels = ["No crimen", "Crimen"]
+
+    # Suponiendo que `prediction` es un vector de probabilidades por clase
+    predicted_index = int(np.argmax(prediction))
+    confidence = f"{100 * prediction[predicted_index]:.2f}%"
+    label = class_labels[predicted_index]
+    print('--' * 90)
+    print(f"\nResultado: {label}")
+    print(f"Confianza: {confidence}")
+    print('--' * 90)
+
+if __name__ == "__main__":
+    main()
