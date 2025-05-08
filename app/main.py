@@ -98,57 +98,58 @@ def load_model():
 
     return model
 
-def preprocess_video(video_path, num_frames=NUM_FRAMES, frame_size=FRAME_SIZE):
+
+def preprocess_frame(frame, frame_size=FRAME_SIZE):
+    frame = cv2.resize(frame, frame_size)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    return frame / 255.0
+
+def predict_crime(model, frames_window):
+    input_tensor = np.expand_dims(np.array(frames_window, dtype=np.float32), axis=0)
+    prediction = model.predict(input_tensor)[0]  # Devuelve [prob_no_crime, prob_crime]
+    return prediction
+
+def simulate_realtime_from_video(video_path, model):
     cap = cv2.VideoCapture(video_path)
-    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    frames = []
-    step = max(1, total_frames // num_frames)
-    for i in range(num_frames):
-        cap.set(cv2.CAP_PROP_POS_FRAMES, i * step)
+    buffer = []
+
+    frame_count = 0
+    print(f"\nAnalizando {video_path}...\n")
+
+    while True:
         ret, frame = cap.read()
         if not ret:
             break
-        frame = cv2.resize(frame, frame_size)
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        frames.append(frame / 255.0)
-    cap.release()
-    while len(frames) < num_frames:
-        frames.append(np.zeros((*frame_size, 3)))
-    return np.expand_dims(np.array(frames, dtype=np.float32), axis=0)
 
-def predict_crime(model, video_tensor):
-    prediction = model.predict(video_tensor)[0]
-    return prediction
+        preprocessed = preprocess_frame(frame)
+        buffer.append(preprocessed)
+
+        if len(buffer) == NUM_FRAMES:
+            prediction = predict_crime(model, buffer)
+            prob_crime = prediction[1] * 100  # Suponemos clase 1 = crimen
+
+            print(f"Frame {frame_count}: Probabilidad de crimen: {prob_crime:.2f}%")
+
+            buffer.pop(0)  # Mantener ventana deslizante
+
+        frame_count += 1
+
+    cap.release()
 
 def main():
-    parser = argparse.ArgumentParser(description="Detectar crimen en video")
-    parser.add_argument("--video", type=str, required=True, help="Ruta al video")
-    args = parser.parse_args()
-
-    if not os.path.exists(args.video):
-        print("Archivo de video no encontrado.")
-        exit(1)
-
     print("Cargando modelo...")
     model = load_model()
 
-    print("Procesando video...")
-    video_tensor = preprocess_video(args.video)
+    video_dir = "./videos"
+    video_files = [f for f in os.listdir(video_dir) if f.endswith((".mp4", ".avi"))]
 
-    print("Prediciendo...")
-    prediction = predict_crime(model, video_tensor)  # Asume que retorna un array de probabilidades (ej: [0.1, 0.9])
+    if len(video_files) < 2:
+        print("Se necesitan al menos dos videos en la carpeta /videos.")
+        return
 
-    # Etiquetas para las clases
-    class_labels = ["No crimen", "Crimen"]
-
-    # Suponiendo que `prediction` es un vector de probabilidades por clase
-    predicted_index = int(np.argmax(prediction))
-    confidence = f"{100 * prediction[predicted_index]:.2f}%"
-    label = class_labels[predicted_index]
-    print('--' * 90)
-    print(f"\nResultado: {label}")
-    print(f"Confianza: {confidence}")
-    print('--' * 90)
+    for video_file in video_files[:2]:
+        video_path = os.path.join(video_dir, video_file)
+        simulate_realtime_from_video(video_path, model)
 
 if __name__ == "__main__":
     main()
