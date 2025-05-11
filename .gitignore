@@ -27,7 +27,10 @@ Anomaly-Detection-Dataset.zip
 __pycache__/
 
 # Ignora los saved_models
-models/saved_models/*
+app/saved_models/*
 
 # Ignora los tuner_logs
 notebooks/tuner_logs/*
+
+# Ignora app/videos
+app/videos/*
