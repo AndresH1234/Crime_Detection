@@ -116,7 +116,7 @@ Estos scripts pueden ejecutarse de forma independiente y no requieren un orden e
 ## Contacto
 
 Para mayor información o consultas, por favor escribir a:
-📧 [andres.herrerag4@gmail.com](mailto:andres.herrerag4@gmail.com)
+[andres.herrerag4@gmail.com](mailto:andres.herrerag4@gmail.com)
 
 ## Licencia
 
